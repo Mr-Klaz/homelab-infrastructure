@@ -78,6 +78,58 @@ As informações de:
 
 foram coletadas durante o baseline e devem ser consideradas parte do diagnóstico inicial da estrutura de armazenamento do Proxmox.
 
+### Storages configurados no Proxmox
+
+O Proxmox possui atualmente dois storages configurados:
+
+| ID | Tipo | Conteúdo | Caminho/Alvo |
+|---|---|---|---|
+| `local` | Directory | Backup, imagens ISO, templates de containers | `/var/lib/vz` |
+| `local-lvm` | LVM-Thin | Imagens de disco de VMs e Containers | VG `pve`, Thin Pool `data` |
+
+#### `local`
+
+Storage baseado em diretório utilizado para:
+
+- Backups
+- Imagens ISO
+- Templates de containers
+
+Caminho:
+
+`/var/lib/vz`
+
+#### `local-lvm`
+
+Storage baseado em LVM-Thin utilizado para:
+
+- Discos de máquinas virtuais
+- Volumes de containers
+
+Configuração observada:
+
+- Volume Group: `pve`
+- Thin Pool: `data`
+- Status: habilitado
+
+A arquitetura observada pode ser representada como:
+
+```text
+Disco físico
+    ↓
+Partição /dev/sda3
+    ↓
+LVM Volume Group: pve
+    ↓
+LVM-Thin Pool: data
+    ↓
+Proxmox Storage: local-lvm
+    ↓
+Discos de VMs / Containers
+
+```
+
+
 ---
 
 ## 5. Rede
