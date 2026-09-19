@@ -198,8 +198,8 @@ Cada alteração relevante deverá ser documentada para manter o histórico téc
 
 ## 8. Status da Documentação
 
-**Status:** Em revisão
+**Status:** Aprovado
 
-Este documento ainda não representa um baseline aprovado.
+Este documento representa o baseline inicial aprovado do servidor Proxmox.
 
-A aprovação deverá ocorrer após revisão do conteúdo e confirmação do responsável pelo projeto.
+O baseline foi revisado e aprovado pelo responsável pelo projeto antes do início das próximas etapas da infraestrutura.
