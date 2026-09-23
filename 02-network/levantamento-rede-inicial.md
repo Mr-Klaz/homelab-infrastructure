@@ -54,7 +54,7 @@ A configuração de DNS observada no Proxmox apresenta:
 - Servidor DNS: `192.168.0.1`
 - Domínio de pesquisa: `proxmox`
 
-O endereço `192.168.0.1` exerce, no ambiente atual, a função de gateway e servidor DNS.
+O endereço `192.168.0.1` exerce, no ambiente atual, a função de gateway e servidor DNS configurado para o Proxmox.
 
 ---
 
@@ -62,10 +62,9 @@ O endereço `192.168.0.1` exerce, no ambiente atual, a função de gateway e ser
 
 A configuração local de hosts apresenta:
 
-```text
-127.0.0.1 localhost.localdomain localhost
-192.168.0.146 local.proxmox local
-```
+`127.0.0.1 localhost.localdomain localhost`
+
+`192.168.0.146 local.proxmox local`
 
 A entrada `192.168.0.146 local.proxmox local` associa o endereço IPv4 do Proxmox ao hostname `local` e ao nome `local.proxmox`.
 
@@ -73,34 +72,15 @@ A entrada `192.168.0.146 local.proxmox local` associa o endereço IPv4 do Proxmo
 
 ## 7. Arquitetura observada
 
-```text
-                    Roteador
-                  192.168.0.1
-                       │
-                     nic0
-                       │
-                    vmbr0
-                 Linux Bridge
-                       │
-              192.168.0.146/24
-                       │
-                    Proxmox
-                     local
-```
+A estrutura de rede observada é:
+
+**Roteador `192.168.0.1` → `nic0` → `vmbr0` → Proxmox `192.168.0.146/24`**
 
 ### Fluxo de rede
 
-```text
-Rede física
-    ↓
-nic0
-    ↓
-vmbr0
-    ↓
-Proxmox
-```
+**Rede física → nic0 → vmbr0 → Proxmox**
 
-A `vmbr0` utiliza `nic0` como porta da bridge e possui o endereço IP utilizado para administração do Proxmox.
+A `vmbr0` utiliza `nic0` como porta física e possui o endereço IP utilizado para administração do Proxmox.
 
 ---
 
@@ -108,9 +88,9 @@ A `vmbr0` utiliza `nic0` como porta da bridge e possui o endereço IP utilizado 
 
 Após o levantamento inicial da configuração de rede, o servidor Homelab foi fisicamente realocado para um local mais adequado, seguro e protegido.
 
-Para realizar a realocação, foi utilizado um cabo Ethernet de aproximadamente **10 metros**.
+Para realizar a realocação, foi utilizado um cabo Ethernet de aproximadamente 10 metros.
 
-A máquina permaneceu conectada ao **mesmo roteador/modem** utilizado anteriormente. Não foram realizadas alterações na configuração lógica da rede durante a mudança de local.
+A máquina permaneceu conectada ao mesmo roteador/modem utilizado anteriormente. Não foram realizadas alterações na configuração lógica da rede durante a mudança de local.
 
 ### Configuração preservada
 
@@ -138,9 +118,9 @@ Após a realocação física, o Proxmox foi iniciado novamente e o acesso ao amb
 
 ### Conclusão
 
-A realocação física do Homelab foi concluída com sucesso utilizando um cabo Ethernet de aproximadamente **10 metros**.
+A realocação física do Homelab foi concluída com sucesso utilizando um cabo Ethernet de aproximadamente 10 metros.
 
-A mudança de localização não exigiu alterações na configuração lógica da rede, mantendo a conectividade do servidor através do mesmo roteador/modem.
+A mudança de localização não exigiu alterações na configuração lógica da rede.
 
 ---
 
@@ -169,8 +149,6 @@ Nenhuma alteração de configuração lógica de rede foi realizada durante o le
 
 O ambiente permanece utilizando a configuração de rede registrada neste documento.
 
----
-
 ### 11.1 Validação operacional da rede
 
 Em 22/09/2026 foi realizada uma validação operacional da configuração de rede do Proxmox, sem aplicação de alterações na configuração.
@@ -179,11 +157,9 @@ Em 22/09/2026 foi realizada uma validação operacional da configuração de red
 
 A interface física `nic0` encontra-se operacional (`UP`) e está vinculada à bridge `vmbr0`.
 
-A bridge `vmbr0` encontra-se operacional (`UP`) e possui o endereço:
+A bridge `vmbr0` encontra-se operacional (`UP`) e possui o endereço `192.168.0.146/24`.
 
-`192.168.0.146/24`
-
-A interface física `nic0` não possui endereço IP próprio. O endereço IPv4 do host está associado à `vmbr0.`
+A interface física `nic0` não possui endereço IP próprio. O endereço IPv4 do host está associado à `vmbr0`.
 
 #### Roteamento
 
@@ -195,9 +171,7 @@ A tabela de rotas confirmou:
 
 #### Teste de conectividade com o gateway
 
-Foi executado:
-
-`ping -c 4 192.168.0.1`
+Foi executado o comando `ping -c 4 192.168.0.1`.
 
 Resultado:
 
@@ -210,9 +184,7 @@ O gateway apresentou conectividade normal com o Proxmox.
 
 #### Teste de conectividade externa
 
-Foi executado:
-
-`ping -c 4 1.1.1.1`
+Foi executado o comando `ping -c 4 1.1.1.1`.
 
 Resultado:
 
@@ -227,19 +199,11 @@ A conectividade IP externa foi confirmada.
 
 A configuração observada no Proxmox utiliza `192.168.0.1` como servidor DNS.
 
-O arquivo `/etc/resolv.conf` também apresenta:
+O arquivo `/etc/resolv.conf` também apresenta `nameserver 192.168.0.1`.
 
-`nameserver 192.168.0.1`
+Entretanto, a consulta `nslookup debian.org 192.168.0.1` retornou erro de conexão recusada na porta DNS `53`.
 
-Entretanto, a consulta:
-
-`nslookup debian.org 192.168.0.1`
-
-retornou erro de conexão recusada na porta DNS `53`.
-
-Como teste comparativo, foi realizada a consulta:
-
-`nslookup debian.org 1.1.1.1`
+Como teste comparativo, foi realizada a consulta `nslookup debian.org 1.1.1.1`.
 
 A resolução ocorreu normalmente.
 
@@ -247,19 +211,47 @@ A resolução ocorreu normalmente.
 
 A validação indica que a conectividade de rede e o roteamento do Proxmox estão operacionais.
 
-A inconsistência identificada está restrita ao servidor DNS atualmente configurado (`192.168.0.1`), que não está aceitando consultas DNS na porta `53`.
+A inconsistência identificada está relacionada ao servidor DNS atualmente configurado (`192.168.0.1`), que não respondeu à consulta DNS realizada na porta `53`.
 
 Nenhuma alteração de configuração foi aplicada durante essa investigação.
 
 A correção do DNS permanece pendente de análise e deverá ser realizada de forma controlada, seguida de nova validação.
 
+#### Validação adicional do serviço DNS
+
+Foi realizado um teste adicional de conectividade TCP com a porta DNS `53` do gateway `192.168.0.1`.
+
+Foi executado o comando `nc -zv 192.168.0.1 53`.
+
+### Resultado
+
+O teste retornou:
+
+`Connection refused`
+
+A conexão TCP com a porta `53` do endereço `192.168.0.1` foi recusada.
+
+Este resultado reforça a evidência de que o serviço DNS do endereço `192.168.0.1` não está aceitando conexões TCP na porta `53`.
+
+> Observação: este teste verificou somente TCP/53. Ainda não foi realizado um teste específico de UDP/53.
+
 ---
 
 ## 12. Próximas etapas
 
-A configuração documentada neste arquivo será utilizada como referência para as próximas etapas de evolução da rede do Homelab.
+O estado atual da rede está documentado e validado.
 
-Alterações futuras deverão ser realizadas de forma controlada, testadas e documentadas quando necessário.
+A próxima etapa será investigar de forma controlada o funcionamento do DNS no gateway `192.168.0.1`.
+
+Antes de qualquer alteração de configuração, serão verificados:
+
+- funcionamento do serviço DNS no roteador/modem;
+- disponibilidade de DNS para os dispositivos da rede;
+- possíveis regras de firewall ou segurança;
+- possibilidade de utilizar um servidor DNS externo;
+- impacto de qualquer alteração no funcionamento do Proxmox.
+
+**Nenhuma alteração de configuração deverá ser realizada antes dessa análise.**
 
 ---
 
