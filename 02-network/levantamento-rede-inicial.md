@@ -171,6 +171,90 @@ O ambiente permanece utilizando a configuração de rede registrada neste docume
 
 ---
 
+### 11.1 Validação operacional da rede
+
+Em 22/09/2026 foi realizada uma validação operacional da configuração de rede do Proxmox, sem aplicação de alterações na configuração.
+
+#### Estado das interfaces
+
+A interface física `nic0` encontra-se operacional (`UP`) e está vinculada à bridge `vmbr0`.
+
+A bridge `vmbr0` encontra-se operacional (`UP`) e possui o endereço:
+
+`192.168.0.146/24`
+
+A interface física `nic0` não possui endereço IP próprio. O endereço IPv4 do host está associado à `vmbr0.`
+
+#### Roteamento
+
+A tabela de rotas confirmou:
+
+- Rede local: `192.168.0.0/24` através de `vmbr0`
+- Endereço de origem: `192.168.0.146`
+- Rota padrão: `192.168.0.1` através de `vmbr0`
+
+#### Teste de conectividade com o gateway
+
+Foi executado:
+
+`ping -c 4 192.168.0.1`
+
+Resultado:
+
+- 4 pacotes enviados
+- 4 pacotes recebidos
+- 0% de perda
+- Latência média de aproximadamente 0,92 ms
+
+O gateway apresentou conectividade normal com o Proxmox.
+
+#### Teste de conectividade externa
+
+Foi executado:
+
+`ping -c 4 1.1.1.1`
+
+Resultado:
+
+- 4 pacotes enviados
+- 4 pacotes recebidos
+- 0% de perda
+- Latência média de aproximadamente 34,17 ms
+
+A conectividade IP externa foi confirmada.
+
+#### Validação do DNS
+
+A configuração observada no Proxmox utiliza `192.168.0.1` como servidor DNS.
+
+O arquivo `/etc/resolv.conf` também apresenta:
+
+`nameserver 192.168.0.1`
+
+Entretanto, a consulta:
+
+`nslookup debian.org 192.168.0.1`
+
+retornou erro de conexão recusada na porta DNS `53`.
+
+Como teste comparativo, foi realizada a consulta:
+
+`nslookup debian.org 1.1.1.1`
+
+A resolução ocorreu normalmente.
+
+#### Diagnóstico
+
+A validação indica que a conectividade de rede e o roteamento do Proxmox estão operacionais.
+
+A inconsistência identificada está restrita ao servidor DNS atualmente configurado (`192.168.0.1`), que não está aceitando consultas DNS na porta `53`.
+
+Nenhuma alteração de configuração foi aplicada durante essa investigação.
+
+A correção do DNS permanece pendente de análise e deverá ser realizada de forma controlada, seguida de nova validação.
+
+---
+
 ## 12. Próximas etapas
 
 A configuração documentada neste arquivo será utilizada como referência para as próximas etapas de evolução da rede do Homelab.
