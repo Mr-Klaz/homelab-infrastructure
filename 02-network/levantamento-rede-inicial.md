@@ -262,3 +262,86 @@ Antes de qualquer alteração de configuração, serão verificados:
 **Data do levantamento:** 20/09/2026
 
 **Data da validação após realocação:** 22/09/2026
+---
+
+## 13. Investigação complementar de DNS — 14/10/2026
+
+### 13.1. Objetivo
+
+Investigar o comportamento da resolução de nomes no Proxmox após a instalação do Cloudflare One Client no computador pessoal com Windows.
+
+**Observação:** o Cloudflare One Client foi instalado no Windows, não diretamente no Proxmox. Não foi demonstrada relação causal entre esse cliente e a falha de DNS do servidor.
+
+### 13.2. Estado da rede
+
+Os testes confirmaram:
+
+- Interface física `nic0` e bridge `vmbr0` em estado `UP`.
+- Endereço IPv4 do Proxmox: `192.168.0.146/24`.
+- Gateway padrão: `192.168.0.1`, pela interface `vmbr0`.
+- Serviço `networking` ativo.
+- Arquivo `/etc/network/interfaces` coerente com o endereço, gateway e associação da bridge observados.
+- Diretório `/etc/network/interfaces.d/` sem arquivos adicionais listados.
+
+### 13.3. Configuração de resolução de nomes
+
+O arquivo `/etc/resolv.conf` apresentou:
+
+```text
+search proxmox
+nameserver 192.168.0.1
+```
+
+O arquivo é regular, não um link simbólico.
+
+O arquivo `/etc/nsswitch.conf` contém:
+
+```text
+hosts: files dns
+networks: files
+```
+
+O pacote `libc6` está instalado, assim como o módulo `/lib/x86_64-linux-gnu/libnss_dns.so.2`.
+
+A resolução de `localhost` via `getent` funcionou. Entretanto, as consultas `getent hosts debian.org`, `getent ahostsv4 debian.org` e `getent ahosts deb.debian.org` não retornaram endereços nos testes realizados.
+
+### 13.4. Resultados dos testes
+
+| Teste | Resultado observado |
+|---|---|
+| Ping para `192.168.0.1` | 4/4 respostas, 0% de perda |
+| Ping para `1.1.1.1` | 4/4 respostas, 0% de perda |
+| `nslookup debian.org 192.168.0.1` | `connection refused` na porta 53 |
+| `nslookup debian.org 1.1.1.1` | Resolução bem-sucedida |
+| `nslookup -vc debian.org 1.1.1.1` | Resolução bem-sucedida com TCP solicitado |
+| `getent` para nomes externos | Sem endereços retornados |
+| `getent hosts localhost` | Resolução local bem-sucedida |
+| `curl -I https://deb.debian.org` | Falha de resolução do nome |
+| `curl` com `--resolve` e IP explícito | Resposta HTTP/2 200 |
+
+### 13.5. Diagnóstico provisório
+
+Os testes demonstram que o gateway responde, que houve conectividade IP externa nos testes realizados e que consultas DNS diretas a `1.1.1.1` foram bem-sucedidas.
+
+Em contrapartida, as consultas DNS direcionadas a `192.168.0.1` foram recusadas, e a resolução de nomes externos pelo mecanismo padrão do sistema não retornou endereços.
+
+**A causa raiz permanece não identificada.** Os resultados não permitem concluir que o roteador esteja defeituoso, nem demonstram relação causal com o Cloudflare One Client instalado no Windows.
+
+### 13.6. Limitações e pendências
+
+- O painel administrativo do roteador Claro ainda não foi inspecionado.
+- Não foi identificado por que o DNS configurado no Proxmox não aceita as consultas testadas.
+- Não foram realizadas alterações de DNS, firewall, rotas ou serviços durante esta investigação.
+- A ausência de saída em comandos de consulta foi registrada como resultado observado, sem presumir uma causa não comprovada.
+
+### 13.7. Próximas ações
+
+1. Revisar e validar este registro.
+2. Investigar o serviço DNS do roteador quando houver acesso ao painel administrativo.
+3. Se necessário, realizar testes adicionais de DNS UDP/TCP e examinar a configuração efetiva de resolução.
+4. Avaliar qualquer alteração somente após compreender as evidências e os riscos.
+5. Validar a documentação antes do commit no GitHub.
+
+**Status:** investigação complementar registrada para revisão.
+
+**Responsável:** Mr. Klaz
