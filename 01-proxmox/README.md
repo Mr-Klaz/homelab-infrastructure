@@ -39,28 +39,21 @@ Configuração atual do laboratório:
 | Proxmox | 192.168.0.146 |
 | Estação de administração | 192.168.0.172 |
 
-### Interface Web
-
-O gerenciamento do Proxmox é realizado através da interface web utilizando a porta TCP `8006`.
+O gerenciamento do Proxmox é realizado pela interface web na porta TCP `8006`. O levantamento inicial foi registrado em [02-network](../02-network/levantamento-rede-inicial.md); a causa do problema de DNS continua pendente e sua investigação está pausada até a etapa de backup.
 
 ---
 
 ## 💾 Armazenamento
 
-O ambiente possui atualmente os seguintes storages configurados:
+O nó possui um único disco físico identificado como WD Purple de 2 TB. Os storages `local` e `local-lvm` estão nesse mesmo disco, portanto não constituem destinos independentes de backup.
 
-- `local`
-- `local-lvm`
-
-O armazenamento físico principal do laboratório é um HDD WD Purple de 2 TB.
+- [Verificação complementar do armazenamento](../03-linux/baseline/armazenamento-proxmox-2026-10-19.md)
 
 ---
 
 ## 🖥️ Virtualização
 
-O Proxmox será utilizado para hospedar máquinas virtuais e containers destinados aos projetos do Homelab.
-
-A criação de novas cargas será realizada de forma gradual devido à disponibilidade atual de 8 GB de RAM.
+O Proxmox será utilizado para hospedar máquinas virtuais e contêineres destinados aos projetos do Homelab. As cargas serão introduzidas gradualmente devido à disponibilidade de 8 GB de RAM.
 
 ---
 
@@ -87,15 +80,14 @@ Cada ocorrência deverá registrar:
 
 ## 📚 Próximas etapas
 
-- [ ] Inventário completo do Proxmox
-- [ ] Documentação da configuração de rede
-- [ ] Documentação dos storages
-- [ ] Criação do primeiro servidor Linux
-- [ ] Implementação de serviços
-- [ ] Backup
-- [ ] Monitoramento
-- [ ] Segurança
-- [ ] Automação
+- [x] Instalação e acesso inicial ao Proxmox VE
+- [x] Inventário inicial do host e do armazenamento
+- [x] Levantamento inicial da rede (causa do DNS ainda pendente)
+- [ ] Definir recursos e objetivo da primeira VM de aprendizagem
+- [ ] Criar e instalar a primeira VM
+- [ ] Planejar o primeiro servidor Linux e serviços
+- [ ] Escolher um destino independente antes de configurar backups
+- [ ] Planejar monitoramento, segurança e automação
 
 ---
 
