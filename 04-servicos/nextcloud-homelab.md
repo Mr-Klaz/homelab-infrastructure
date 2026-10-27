@@ -107,3 +107,30 @@ Ordem proposta, respeitando a preferência de uma etapa por vez e documentação
 
 Nenhuma das etapas acima deve ser executada durante esta revisão. Nenhuma mudança foi feita no homelab.
 
+
+
+## Inventário confirmado do host e do LXC — 27/10/2026
+
+Coleta somente de leitura executada no Proxmox e no LXC 110. Endereços IP, MAC e outros identificadores da rede foram omitidos.
+
+### Host e máquinas
+
+- Proxmox VE: gerenciador `9.2.2`, kernel `7.0.2-6-pve` (o pacote `proxmox-ve` reportou `9.2.0`).
+- VM 100 — Linux Mint: desligada; 4 GiB de memória e disco de boot de 32 GiB.
+- LXC 110 — `nextcloud`: em execução, Debian GNU/Linux 13.7 (Trixie), não privilegiado, 2 vCPUs, 2 GiB de memória e 512 MiB de swap. Inicialização automática desabilitada.
+
+### Volumes e armazenamento
+
+- Raiz do LXC: volume `local-lvm:vm-110-disk-0`, provisionado com 16 GiB; no momento da coleta, 2,4 GiB usados e 13 GiB disponíveis.
+- Volume adicional: `local-lvm:vm-110-disk-1`, provisionado com 300 GiB e montado no container em `/mnt/nextcloud-data`; o sistema de arquivos apresentava 295 GiB, com 75 MiB usados e 280 GiB disponíveis.
+- A montagem foi confirmada como ext4 e gravável. Ainda falta confirmar se o `datadirectory` do Nextcloud aponta para esse caminho.
+- O host apresentou um disco físico de 1,8 TiB. Os dois volumes do LXC residem em `local-lvm`, portanto o volume adicional não constitui backup independente.
+
+### Serviços e rede do container
+
+- Apache, MariaDB e Cron estavam ativos e habilitados no systemd do LXC.
+- A interface do container usa DHCP na bridge `vmbr0`; o endereço e MAC foram omitidos.
+- O estado ativo do serviço Cron não confirma que o Nextcloud esteja em modo Cron nem que exista um agendamento de `cron.php`. Isso será verificado separadamente.
+- Versão do MariaDB, parâmetros de tuning, diretório de dados do Nextcloud, modo/agendamento de tarefas e validações recentes ainda não foram confirmados.
+
+Estes valores são uma fotografia da coleta em 27/10/2026; podem mudar. Nenhum serviço ou configuração foi alterado.
