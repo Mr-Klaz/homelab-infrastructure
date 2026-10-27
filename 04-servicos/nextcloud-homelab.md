@@ -166,8 +166,20 @@ Esses são valores em execução. Não foi confirmado se são padrões da distri
 
 - O valor de `core.backgroundjobs_mode` reportado pelo Nextcloud é `cron`.
 - O serviço Cron do LXC estava ativo e habilitado na coleta de 27/10.
-- `crontab -u www-data -l` respondeu que não há crontab para `www-data`. Portanto, o modo Cron está selecionado, mas a execução periódica de `cron.php` ainda não está comprovada. O agendamento pode estar em outra configuração; isso será verificado antes de qualquer correção.
+- O arquivo `/etc/cron.d/nextcloud` contém `*/5 * * * * www-data php -f /var/www/nextcloud/cron.php`, configurando execução a cada cinco minutos como `www-data`.
+- Não há crontab pessoal para `www-data` nem para `root`; os comandos não retornaram timer systemd correspondente. Isso é compatível com o agendamento em `/etc/cron.d`.
+- A configuração do agendamento está confirmada. Ainda falta confirmar pela visão geral do Nextcloud ou por registro apropriado que as execuções estão ocorrendo sem erros.
 
 ### Validações e lacunas
 
 A saída de `occ status` confirma que a instalação está ativa e sem atualização de banco pendente naquele momento. Não foi executado teste de integridade do banco, não foram examinados logs e não foi comprovada uma execução recente do Cron.
+
+## Diretório de dados e agendamento confirmados — 27/10/2026
+
+- O diretório configurado pelo Nextcloud é `/mnt/nextcloud-data/data`, dentro do volume adicional do LXC 110.
+- O ponto de montagem estava em ext4, com 295 GiB apresentados, 75 MiB usados e aproximadamente 280 GiB disponíveis.
+- O diretório ocupava 73 MiB e tinha proprietário/grupo `www-data:www-data`, com permissões `drwxr-x---` (750).
+- A configuração de modo do Nextcloud é `cron`. O arquivo `/etc/cron.d/nextcloud` agenda `php -f /var/www/nextcloud/cron.php` a cada cinco minutos como `www-data`.
+- Não há crontab pessoal para `www-data` ou para `root`; a consulta de timers systemd não listou item relacionado. O agendamento no Cron tradicional é suficiente como configuração, mas ainda não constitui evidência de execução recente bem-sucedida.
+
+O tamanho observado é uma fotografia; não indica por si só que todos os arquivos pessoais esperados já foram carregados. Nenhuma alteração foi feita.
