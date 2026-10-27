@@ -131,6 +131,43 @@ Coleta somente de leitura executada no Proxmox e no LXC 110. Endereços IP, MAC 
 - Apache, MariaDB e Cron estavam ativos e habilitados no systemd do LXC.
 - A interface do container usa DHCP na bridge `vmbr0`; o endereço e MAC foram omitidos.
 - O estado ativo do serviço Cron não confirma que o Nextcloud esteja em modo Cron nem que exista um agendamento de `cron.php`. Isso será verificado separadamente.
-- Versão do MariaDB, parâmetros de tuning, diretório de dados do Nextcloud, modo/agendamento de tarefas e validações recentes ainda não foram confirmados.
+- A versão e variáveis atuais do MariaDB, o diretório de dados e o modo Cron foram confirmados na coleta de 27/10/2026 e estão detalhados na seção de estado atual. Ainda não foi determinado se os valores do MariaDB foram ajustados deliberadamente nem onde está o agendamento efetivo do Nextcloud.
 
 Estes valores são uma fotografia da coleta em 27/10/2026; podem mudar. Nenhum serviço ou configuração foi alterado.
+
+## Estado atual de Nextcloud, MariaDB e Cron — 27/10/2026
+
+Coleta somente de leitura. Nenhuma configuração foi alterada.
+
+### Nextcloud e dados
+
+- `occ status`: instalação ativa; Nextcloud `35.0.2.2` (versão exibida `35.0.2`); modo de manutenção desativado; nenhuma atualização de banco pendente.
+- Tipo de banco: `mysql`; host reportado: `localhost`. Nome de banco, usuário e credenciais não foram coletados.
+- Diretório de dados reportado pelo Nextcloud: `/mnt/nextcloud-data/data`. Esse caminho fica dentro do volume adicional montado em `/mnt/nextcloud-data`.
+- Na coleta anterior, o sistema de arquivos montado tinha 75 MiB usados e cerca de 280 GiB disponíveis. Esse número é uma fotografia do uso do volume, não uma validação da integridade nem da completude dos arquivos.
+
+### MariaDB
+
+- Versão reportada: `11.8.6-MariaDB-0+deb13u1`.
+- Variáveis em execução observadas:
+
+| Variável | Valor observado |
+|---|---:|
+| `innodb_buffer_pool_size` | 128 MiB |
+| `innodb_flush_log_at_trx_commit` | 1 |
+| `innodb_log_file_size` | 96 MiB |
+| `max_connections` | 151 |
+| `max_heap_table_size` | 32 MiB |
+| `tmp_table_size` | 32 MiB |
+
+Esses são valores em execução. Não foi confirmado se são padrões da distribuição ou tuning manual, nem foram coletados os arquivos de origem, histórico de mudanças, métricas de carga ou testes de desempenho. Não alterar até avaliar recursos do LXC e necessidade do serviço.
+
+### Tarefas em segundo plano
+
+- O valor de `core.backgroundjobs_mode` reportado pelo Nextcloud é `cron`.
+- O serviço Cron do LXC estava ativo e habilitado na coleta de 27/10.
+- `crontab -u www-data -l` respondeu que não há crontab para `www-data`. Portanto, o modo Cron está selecionado, mas a execução periódica de `cron.php` ainda não está comprovada. O agendamento pode estar em outra configuração; isso será verificado antes de qualquer correção.
+
+### Validações e lacunas
+
+A saída de `occ status` confirma que a instalação está ativa e sem atualização de banco pendente naquele momento. Não foi executado teste de integridade do banco, não foram examinados logs e não foi comprovada uma execução recente do Cron.
