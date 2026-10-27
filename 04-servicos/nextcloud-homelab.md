@@ -192,7 +192,7 @@ As capturas da página Administração → Visão geral mostram Nextcloud Hub 26
 
 - Acesso identificado como HTTP inseguro; não há evidência de HTTPS configurado.
 - Dois erros no log desde `20/10/2026 22:31:15`; o conteúdo não foi expandido.
-- Três verificações do banco de dados falhando; os detalhes não foram expandidos.
+- A visão geral inicialmente reportou três verificações do banco falhando. Na captura expandida posterior, a seção InnoDB mostrava uma falha detalhada em `innodb_log_file_size`; não se deve inferir que todos os grupos de verificações foram expandidos.
 - Migrações de mimetype disponíveis. A própria interface sugere uma ação de reparação cara, mas ela não foi executada; avaliar apenas depois de entender os erros e ter backup restaurável.
 - Aviso de HSTS ausente. Não configurar HSTS até que HTTPS funcione para o acesso privado escolhido.
 - OPcache informa o buffer de strings internas quase cheio e recomenda valor superior a `8`; ajuste não realizado.
@@ -202,3 +202,13 @@ As capturas da página Administração → Visão geral mostram Nextcloud Hub 26
 A interface também indica ausência de memcache, locking transacional usando o banco, 2FA disponível mas não obrigatório, região de telefone e e-mail não configurados, ID de servidor ausente, Deploy Daemon do AppAPI não definido e Imagick sem suporte a SVG. A necessidade desses itens depende do uso e não é motivo para instalar componentes automaticamente.
 
 As capturas não confirmam a última execução bem-sucedida do Cron nem mostram a área Arquivos. Os avisos de log e banco permanecem pendentes de diagnóstico. Nenhuma mudança foi feita no servidor.
+
+### Detalhe da verificação InnoDB — captura expandida de 27/10/2026
+
+- A seção InnoDB indicava **1 falha**.
+- `innodb_log_file_size`: valor em execução mostrado como `100663296` bytes (96 MiB); a verificação recomenda ao menos 128 MiB.
+- A tela também mostra `innodb_log_file_size=256M` como configuração que requer reinicialização. Isso sugere que o valor de 256 MiB está definido para entrar em vigor após reiniciar MariaDB, enquanto o processo em execução ainda reporta 96 MiB. A origem exata da configuração e o estado do serviço devem ser confirmados antes de qualquer reinicialização.
+- A verificação de taxa de acerto do buffer pool foi ignorada porque o servidor tinha apenas 1,6 hora de atividade; a tela indica que precisa de pelo menos 24 horas para estatísticas confiáveis.
+- As verificações de razão de páginas sujas e modo de flush do log foram marcadas como sucesso; a de tamanho de log muito grande também apareceu como sucesso. A verificação de tamanho de log relativo ao buffer pool foi ignorada por falta de uma métrica no grupo.
+
+Não foi clicado o botão de reinício nem feita qualquer alteração. O resultado precisa ser reavaliado após confirmar a origem da configuração e planejar uma recuperação segura.
