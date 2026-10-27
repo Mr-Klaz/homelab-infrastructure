@@ -2,7 +2,7 @@
 
 Laboratório prático de infraestrutura de TI criado para desenvolver conhecimentos em administração de sistemas, virtualização, redes, segurança, monitoramento e automação.
 
-O ambiente utiliza hardware físico próprio e Proxmox VE como plataforma de virtualização. O projeto evoluirá conforme os recursos e necessidades forem sendo definidos.
+O ambiente utiliza hardware físico próprio e Proxmox VE como plataforma de virtualização. Este é um servidor pessoal, destinado ao uso exclusivo do responsável pelo Homelab. Os serviços devem permanecer privados, acessíveis somente pela rede local ou por um meio privado autorizado; não publicar painéis, aplicações ou portas diretamente na Internet.
 
 ---
 
@@ -15,7 +15,7 @@ O ambiente utiliza hardware físico próprio e Proxmox VE como plataforma de vir
 - Implementar monitoramento, backup e segurança.
 - Praticar automação de infraestrutura.
 - Documentar problemas, soluções e procedimentos técnicos.
-- Construir um portfólio técnico baseado em projetos práticos.
+- Manter documentação técnica organizada para aprendizado e manutenção do ambiente pessoal.
 
 ---
 
@@ -50,9 +50,9 @@ O ambiente utiliza hardware físico próprio e Proxmox VE como plataforma de vir
 | Configuração inicial de rede | ✅ Registrada; DNS segue pendente |
 | Troubleshooting de acesso ao Proxmox | ✅ Concluído e documentado |
 | Inventário inicial do host e armazenamento | ✅ Documentado; capturas complementares incorporadas |
-| Primeira VM para aprendizagem | 🔄 Próximo marco: definir finalidade e recursos |
-| Servidor Linux e serviços | ⏳ Planejado |
-| Backup em destino independente | ⏳ Planejado; o host atualmente tem somente um disco |
+| VM Linux Mint | ⏸️ Criada e atualmente desligada; finalidade e retomada pendentes |
+| LXC 110 — Nextcloud | 🟡 Instância instalada e acessível na LAN; revisão documental registrada |
+| Backup independente e teste de restauração | ⏳ Pendente; o host atualmente tem somente um disco |
 | Windows Server / Active Directory | ⏳ Planejado |
 | Docker | ⏳ Planejado |
 | Monitoramento | ⏳ Planejado |
@@ -65,7 +65,7 @@ Estas são ideias para avaliar ao longo do projeto, sem compromisso de instalar 
 
 - Armazenamento e compartilhamento de arquivos pessoais
 - Casa inteligente com Home Assistant
-- Acesso remoto/VPN com Tailscale
+- Acesso remoto privado por VPN, somente se necessário e sem exposição direta dos serviços
 - Serviços para músicas, filmes e séries
 - OpenMediaVault para administrar armazenamento e compartilhamento, após definir discos e estratégia de backup
 
@@ -90,6 +90,7 @@ Os problemas encontrados durante a construção do laboratório serão documenta
 
 - [Acesso ao Proxmox bloqueado por VPN](./01-proxmox/troubleshooting/acesso-proxmox-vpn.md)
 - [Levantamento inicial de rede e DNS](./02-network/levantamento-rede-inicial.md)
+- [Nextcloud no LXC 110](./04-servicos/nextcloud-homelab.md)
 
 ---
 
@@ -101,10 +102,11 @@ A documentação está organizada por área:
 01-proxmox/
 02-network/
 03-linux/
-04-windows-server/
-05-docker/
-06-monitoring/
-07-backup/
-08-security/
-09-automation/
+04-servicos/
+05-windows-server/
+06-docker/
+07-monitoring/
+08-backup/
+09-security/
+10-automation/
 ```

@@ -40,8 +40,8 @@ A bridge principal identificada é:
 
 ### Endereçamento
 
-- IPv4/CIDR: `192.168.0.146/24`
-- Gateway IPv4: `192.168.0.1`
+- IPv4/CIDR: `[IP LAN do Proxmox]/[CIDR omitido]`
+- Gateway IPv4: `[IP LAN do gateway/DNS omitido]`
 - IPv6: não configurado
 - Gateway IPv6: não configurado
 
@@ -51,10 +51,10 @@ A bridge principal identificada é:
 
 A configuração de DNS observada no Proxmox apresenta:
 
-- Servidor DNS: `192.168.0.1`
+- Servidor DNS: `[IP LAN do gateway/DNS omitido]`
 - Domínio de pesquisa: `proxmox`
 
-O endereço `192.168.0.1` exerce, no ambiente atual, a função de gateway e servidor DNS configurado para o Proxmox.
+O endereço `[IP LAN do gateway/DNS omitido]` exerce, no ambiente atual, a função de gateway e servidor DNS configurado para o Proxmox.
 
 ---
 
@@ -64,9 +64,9 @@ A configuração local de hosts apresenta:
 
 `127.0.0.1 localhost.localdomain localhost`
 
-`192.168.0.146 local.proxmox local`
+`[IP LAN do Proxmox omitido] [hostname interno omitido]`
 
-A entrada `192.168.0.146 local.proxmox local` associa o endereço IPv4 do Proxmox ao hostname `local` e ao nome `local.proxmox`.
+A entrada `[IP LAN do Proxmox omitido] [hostname interno omitido]` associa o endereço IPv4 do Proxmox ao hostname `local` e ao nome `local.proxmox`.
 
 ---
 
@@ -74,7 +74,7 @@ A entrada `192.168.0.146 local.proxmox local` associa o endereço IPv4 do Proxmo
 
 A estrutura de rede observada é:
 
-**Roteador `192.168.0.1` → `nic0` → `vmbr0` → Proxmox `192.168.0.146/24`**
+**Roteador `[IP LAN do gateway/DNS omitido]` → `nic0` → `vmbr0` → Proxmox `[IP LAN do Proxmox]/[CIDR omitido]`**
 
 ### Fluxo de rede
 
@@ -94,9 +94,9 @@ A máquina permaneceu conectada ao mesmo roteador/modem utilizado anteriormente.
 
 ### Configuração preservada
 
-- IP do Proxmox: `192.168.0.146/24`
-- Gateway: `192.168.0.1`
-- Servidor DNS: `192.168.0.1`
+- IP do Proxmox: `[IP LAN do Proxmox]/[CIDR omitido]`
+- Gateway: `[IP LAN do gateway/DNS omitido]`
+- Servidor DNS: `[IP LAN do gateway/DNS omitido]`
 - Bridge: `vmbr0`
 - Interface física: `nic0`
 
@@ -109,8 +109,8 @@ Após a realocação física, o Proxmox foi iniciado novamente e o acesso ao amb
 ### Resultado
 
 - Configuração lógica de rede permaneceu inalterada.
-- Endereço IP permaneceu `192.168.0.146/24`.
-- Gateway permaneceu `192.168.0.1`.
+- Endereço IP permaneceu `[IP LAN do Proxmox]/[CIDR omitido]`.
+- Gateway permaneceu `[IP LAN do gateway/DNS omitido]`.
 - A bridge `vmbr0` permaneceu operacional.
 - O acesso ao painel Web do Proxmox foi restabelecido com sucesso.
 - Dois usuários conseguiram acessar o ambiente após a realocação.
@@ -157,7 +157,7 @@ Em 22/09/2026 foi realizada uma validação operacional da configuração de red
 
 A interface física `nic0` encontra-se operacional (`UP`) e está vinculada à bridge `vmbr0`.
 
-A bridge `vmbr0` encontra-se operacional (`UP`) e possui o endereço `192.168.0.146/24`.
+A bridge `vmbr0` encontra-se operacional (`UP`) e possui o endereço `[IP LAN do Proxmox]/[CIDR omitido]`.
 
 A interface física `nic0` não possui endereço IP próprio. O endereço IPv4 do host está associado à `vmbr0`.
 
@@ -165,13 +165,13 @@ A interface física `nic0` não possui endereço IP próprio. O endereço IPv4 d
 
 A tabela de rotas confirmou:
 
-- Rede local: `192.168.0.0/24` através de `vmbr0`
-- Endereço de origem: `192.168.0.146`
-- Rota padrão: `192.168.0.1` através de `vmbr0`
+- Rede local: `[sub-rede LAN omitida]` através de `vmbr0`
+- Endereço de origem: `[IP LAN do Proxmox omitido]`
+- Rota padrão: `[IP LAN do gateway/DNS omitido]` através de `vmbr0`
 
 #### Teste de conectividade com o gateway
 
-Foi executado o comando `ping -c 4 192.168.0.1`.
+Foi executado o comando `ping -c 4 [IP LAN do gateway/DNS omitido]`.
 
 Resultado:
 
@@ -197,11 +197,11 @@ A conectividade IP externa foi confirmada.
 
 #### Validação do DNS
 
-A configuração observada no Proxmox utiliza `192.168.0.1` como servidor DNS.
+A configuração observada no Proxmox utiliza `[IP LAN do gateway/DNS omitido]` como servidor DNS.
 
-O arquivo `/etc/resolv.conf` também apresenta `nameserver 192.168.0.1`.
+O arquivo `/etc/resolv.conf` também apresenta `nameserver [IP LAN do gateway/DNS omitido]`.
 
-Entretanto, a consulta `nslookup debian.org 192.168.0.1` retornou erro de conexão recusada na porta DNS `53`.
+Entretanto, a consulta `nslookup debian.org [IP LAN do gateway/DNS omitido]` retornou erro de conexão recusada na porta DNS `53`.
 
 Como teste comparativo, foi realizada a consulta `nslookup debian.org 1.1.1.1`.
 
@@ -211,7 +211,7 @@ A resolução ocorreu normalmente.
 
 A validação indica que a conectividade de rede e o roteamento do Proxmox estão operacionais.
 
-A inconsistência identificada está relacionada ao servidor DNS atualmente configurado (`192.168.0.1`), que não respondeu à consulta DNS realizada na porta `53`.
+A inconsistência identificada está relacionada ao servidor DNS atualmente configurado (`[IP LAN do gateway/DNS omitido]`), que não respondeu à consulta DNS realizada na porta `53`.
 
 Nenhuma alteração de configuração foi aplicada durante essa investigação.
 
@@ -219,9 +219,9 @@ A correção do DNS permanece pendente de análise e deverá ser realizada de fo
 
 #### Validação adicional do serviço DNS
 
-Foi realizado um teste adicional de conectividade TCP com a porta DNS `53` do gateway `192.168.0.1`.
+Foi realizado um teste adicional de conectividade TCP com a porta DNS `53` do gateway `[IP LAN do gateway/DNS omitido]`.
 
-Foi executado o comando `nc -zv 192.168.0.1 53`.
+Foi executado o comando `nc -zv [IP LAN do gateway/DNS omitido] 53`.
 
 ### Resultado
 
@@ -229,9 +229,9 @@ O teste retornou:
 
 `Connection refused`
 
-A conexão TCP com a porta `53` do endereço `192.168.0.1` foi recusada.
+A conexão TCP com a porta `53` do endereço `[IP LAN do gateway/DNS omitido]` foi recusada.
 
-Este resultado reforça a evidência de que o serviço DNS do endereço `192.168.0.1` não está aceitando conexões TCP na porta `53`.
+Este resultado reforça a evidência de que o serviço DNS do endereço `[IP LAN do gateway/DNS omitido]` não está aceitando conexões TCP na porta `53`.
 
 > Observação: este teste verificou somente TCP/53. Ainda não foi realizado um teste específico de UDP/53.
 
@@ -241,7 +241,7 @@ Este resultado reforça a evidência de que o serviço DNS do endereço `192.168
 
 O estado atual da rede está documentado e validado.
 
-A próxima etapa será investigar de forma controlada o funcionamento do DNS no gateway `192.168.0.1`.
+A próxima etapa será investigar de forma controlada o funcionamento do DNS no gateway `[IP LAN do gateway/DNS omitido]`.
 
 Antes de qualquer alteração de configuração, serão verificados:
 
@@ -277,8 +277,8 @@ Investigar o comportamento da resolução de nomes no Proxmox após a instalaç�
 Os testes confirmaram:
 
 - Interface física `nic0` e bridge `vmbr0` em estado `UP`.
-- Endereço IPv4 do Proxmox: `192.168.0.146/24`.
-- Gateway padrão: `192.168.0.1`, pela interface `vmbr0`.
+- Endereço IPv4 do Proxmox: `[IP LAN do Proxmox]/[CIDR omitido]`.
+- Gateway padrão: `[IP LAN do gateway/DNS omitido]`, pela interface `vmbr0`.
 - Serviço `networking` ativo.
 - Arquivo `/etc/network/interfaces` coerente com o endereço, gateway e associação da bridge observados.
 - Diretório `/etc/network/interfaces.d/` sem arquivos adicionais listados.
@@ -289,7 +289,7 @@ O arquivo `/etc/resolv.conf` apresentou:
 
 ```text
 search proxmox
-nameserver 192.168.0.1
+nameserver [IP LAN do gateway/DNS omitido]
 ```
 
 O arquivo é regular, não um link simbólico.
@@ -309,9 +309,9 @@ A resolução de `localhost` via `getent` funcionou. Entretanto, as consultas `g
 
 | Teste | Resultado observado |
 |---|---|
-| Ping para `192.168.0.1` | 4/4 respostas, 0% de perda |
+| Ping para `[IP LAN do gateway/DNS omitido]` | 4/4 respostas, 0% de perda |
 | Ping para `1.1.1.1` | 4/4 respostas, 0% de perda |
-| `nslookup debian.org 192.168.0.1` | `connection refused` na porta 53 |
+| `nslookup debian.org [IP LAN do gateway/DNS omitido]` | `connection refused` na porta 53 |
 | `nslookup debian.org 1.1.1.1` | Resolução bem-sucedida |
 | `nslookup -vc debian.org 1.1.1.1` | Resolução bem-sucedida com TCP solicitado |
 | `getent` para nomes externos | Sem endereços retornados |
@@ -323,7 +323,7 @@ A resolução de `localhost` via `getent` funcionou. Entretanto, as consultas `g
 
 Os testes demonstram que o gateway responde, que houve conectividade IP externa nos testes realizados e que consultas DNS diretas a `1.1.1.1` foram bem-sucedidas.
 
-Em contrapartida, as consultas DNS direcionadas a `192.168.0.1` foram recusadas, e a resolução de nomes externos pelo mecanismo padrão do sistema não retornou endereços.
+Em contrapartida, as consultas DNS direcionadas a `[IP LAN do gateway/DNS omitido]` foram recusadas, e a resolução de nomes externos pelo mecanismo padrão do sistema não retornou endereços.
 
 **A causa raiz permanece não identificada.** Os resultados não permitem concluir que o roteador esteja defeituoso, nem demonstram relação causal com o Cloudflare One Client instalado no Windows.
 

@@ -5,7 +5,7 @@
 - **Plataforma:** Proxmox VE
 - **Versão:** 9.2.2
 - **Nó:** local
-- **Usuário:** root@pam
+- **Usuário:** identificador da conta administrativa omitido
 - **Serviço afetado:** Console Shell
 - **Código do erro:** HTTP 401 — Authentication failed
 

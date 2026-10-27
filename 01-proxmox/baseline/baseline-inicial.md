@@ -139,10 +139,10 @@ Discos de VMs / Containers
 | Item | Informação |
 |---|---|
 | Interface bridge principal | `vmbr0` |
-| Endereço IP do Proxmox | `192.168.0.146/24` |
-| Gateway | `192.168.0.1` |
-| Roteador | `192.168.0.1` |
-| Acesso Web | `https://192.168.0.146:8006` |
+| Endereço IP do Proxmox | `[IP LAN do Proxmox]/[CIDR omitido]` |
+| Gateway | `[IP LAN do gateway/DNS omitido]` |
+| Roteador | `[IP LAN do gateway/DNS omitido]` |
+| Acesso Web | `https://[IP LAN do Proxmox omitido]:8006` |
 
 ### Observações
 

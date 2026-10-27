@@ -33,13 +33,18 @@ O projeto tem como objetivo desenvolver conhecimentos práticos em virtualizaç�
 
 Configuração atual do laboratório:
 
-| Dispositivo | Endereço |
+| Elemento | Registro público |
 |---|---|
-| Roteador/Gateway | 192.168.0.1 |
-| Proxmox | 192.168.0.146 |
-| Estação de administração | 192.168.0.172 |
+| Rede de administração | LAN privada; endereços omitidos |
+| Acesso externo | Não previsto para exposição direta dos serviços |
 
-O gerenciamento do Proxmox é realizado pela interface web na porta TCP `8006`. O levantamento inicial foi registrado em [02-network](../02-network/levantamento-rede-inicial.md); a causa do problema de DNS continua pendente e sua investigação está pausada até a etapa de backup.
+O gerenciamento do Proxmox é realizado pela interface web na porta TCP `8006`, apenas pela rede privada. Não encaminhar essa porta à Internet. O levantamento inicial foi registrado em [02-network](../02-network/levantamento-rede-inicial.md); a causa do problema de DNS continua pendente e sua investigação está pausada até a etapa de backup.
+
+---
+
+## 🔒 Acesso
+
+Este é um servidor pessoal e privado. Serviços e painéis permanecem limitados à LAN ou a um meio privado autorizado; nenhuma porta deve ser publicada diretamente na Internet.
 
 ---
 
@@ -75,6 +80,7 @@ Cada ocorrência deverá registrar:
 ### Casos
 
 - [Acesso ao Proxmox bloqueado por VPN](./troubleshooting/acesso-proxmox-vpn.md)
+- [Nextcloud no LXC 110](../04-servicos/nextcloud-homelab.md)
 
 ---
 
@@ -83,10 +89,9 @@ Cada ocorrência deverá registrar:
 - [x] Instalação e acesso inicial ao Proxmox VE
 - [x] Inventário inicial do host e do armazenamento
 - [x] Levantamento inicial da rede (causa do DNS ainda pendente)
-- [ ] Definir recursos e objetivo da primeira VM de aprendizagem
-- [ ] Criar e instalar a primeira VM
-- [ ] Planejar o primeiro servidor Linux e serviços
-- [ ] Escolher um destino independente antes de configurar backups
+- [x] Criar a VM Linux Mint; mantê-la desligada até definir a próxima etapa
+- [x] Criar o LXC 110 para Nextcloud; revisar/documentar a configuração
+- [ ] Escolher um destino independente e testar a restauração antes de confiar backups
 - [ ] Planejar monitoramento, segurança e automação
 
 ---

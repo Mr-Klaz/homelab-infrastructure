@@ -73,9 +73,9 @@ Saída observada de `ip -br addr`:
 |---|---|---|
 | `lo` | UNKNOWN | `127.0.0.1/8`, `::1/128` |
 | `nic0` | UP | Nenhum endereço IP reportado |
-| `vmbr0` | UP | `192.168.0.146/24`, `fe80::2e0:1fff:fe9b:476a/64` |
+| `vmbr0` | UP | `[IP LAN do Proxmox]/[CIDR omitido]`, `[IPv6 local omitido]` |
 
-O arquivo `/etc/resolv.conf` indicava `nameserver 192.168.0.1`.
+O arquivo `/etc/resolv.conf` indicava `nameserver [IP LAN do gateway/DNS omitido]`.
 
 ### DNS
 
