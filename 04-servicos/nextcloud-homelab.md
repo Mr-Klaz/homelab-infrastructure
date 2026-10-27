@@ -183,3 +183,22 @@ A saída de `occ status` confirma que a instalação está ativa e sem atualiza�
 - Não há crontab pessoal para `www-data` ou para `root`; a consulta de timers systemd não listou item relacionado. O agendamento no Cron tradicional é suficiente como configuração, mas ainda não constitui evidência de execução recente bem-sucedida.
 
 O tamanho observado é uma fotografia; não indica por si só que todos os arquivos pessoais esperados já foram carregados. Nenhuma alteração foi feita.
+
+## Visão geral do Nextcloud — capturas de 27/10/2026
+
+As capturas da página Administração → Visão geral mostram Nextcloud Hub 26 Summer (`35.0.2`), canal Estável, com mensagem de versão atualizada na data da captura.
+
+### Erros e avisos que exigem revisão
+
+- Acesso identificado como HTTP inseguro; não há evidência de HTTPS configurado.
+- Dois erros no log desde `20/10/2026 22:31:15`; o conteúdo não foi expandido.
+- Três verificações do banco de dados falhando; os detalhes não foram expandidos.
+- Migrações de mimetype disponíveis. A própria interface sugere uma ação de reparação cara, mas ela não foi executada; avaliar apenas depois de entender os erros e ter backup restaurável.
+- Aviso de HSTS ausente. Não configurar HSTS até que HTTPS funcione para o acesso privado escolhido.
+- OPcache informa o buffer de strings internas quase cheio e recomenda valor superior a `8`; ajuste não realizado.
+
+### Informativos mostrados
+
+A interface também indica ausência de memcache, locking transacional usando o banco, 2FA disponível mas não obrigatório, região de telefone e e-mail não configurados, ID de servidor ausente, Deploy Daemon do AppAPI não definido e Imagick sem suporte a SVG. A necessidade desses itens depende do uso e não é motivo para instalar componentes automaticamente.
+
+As capturas não confirmam a última execução bem-sucedida do Cron nem mostram a área Arquivos. Os avisos de log e banco permanecem pendentes de diagnóstico. Nenhuma mudança foi feita no servidor.
