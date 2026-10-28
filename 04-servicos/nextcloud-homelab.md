@@ -212,3 +212,14 @@ As capturas não confirmam a última execução bem-sucedida do Cron nem mostram
 - As verificações de razão de páginas sujas e modo de flush do log foram marcadas como sucesso; a de tamanho de log muito grande também apareceu como sucesso. A verificação de tamanho de log relativo ao buffer pool foi ignorada por falta de uma métrica no grupo.
 
 Não foi clicado o botão de reinício nem feita qualquer alteração. O resultado precisa ser reavaliado após confirmar a origem da configuração e planejar uma recuperação segura.
+
+### Trechos sugeridos para log de consultas lentas — 28/10/2026
+
+A interface do Nextcloud apresentou dois trechos sugeridos para adicionar em `my.cnf`, sob a seção `[mysqld]`:
+
+```ini
+slow_query_log = ON
+long_query_time = 2
+```
+
+São recomendações da interface para habilitar o log de consultas lentas e definir o limite indicado; não são evidência de que os parâmetros já estejam ativos. A interface informa que a aplicação exige reiniciar o banco. Nenhuma alteração ou reinicialização foi feita. Antes de considerar a recomendação, confirmar a configuração atualmente carregada e o arquivo de origem; avaliar localização, permissões e rotação do log. Manter isso separado da falha do `innodb_log_file_size` (96 MiB em execução; 256 MiB aparece pendente de reinicialização).
