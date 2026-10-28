@@ -223,3 +223,7 @@ A página Administração → Visão geral classificou os dois itens como **Dica
 | `long_query_time` | 10 segundos | `long_query_time = 2` (ou menos) |
 
 Os trechos mostrados para adicionar em `my.cnf`, seção `[mysqld]`, são recomendações para registrar consultas lentas e reduzir o limite de registro. Não são evidência de que esses valores estejam definidos nos arquivos de configuração. Nenhuma alteração ou reinicialização foi feita. Esses itens são sugestões de diagnóstico/desempenho e não corrigem a falha separada de `innodb_log_file_size` (96 MiB em execução; 256 MiB aparece pendente de reinicialização). Caso sejam avaliados depois, confirmar a origem dos parâmetros e planejar retenção/permissões do log.
+
+### Consulta dos arquivos MariaDB — 28/10/2026
+
+Uma busca somente de leitura em `/etc/mysql` e `/etc/my.cnf` por atribuições explícitas a `innodb_log_file_size`, `slow_query_log` e `long_query_time` não retornou linhas. Isso indica que esses parâmetros não aparecem explicitamente nesses caminhos consultados; não exclui outras fontes de configuração fora deles. Os valores em execução previamente observados continuam sendo a referência para o estado ativo. Nenhuma edição ou reinicialização foi feita.
