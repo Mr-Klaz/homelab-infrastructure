@@ -215,11 +215,11 @@ Não foi clicado o botão de reinício nem feita qualquer alteração. O resulta
 
 ### Trechos sugeridos para log de consultas lentas — 28/10/2026
 
-A interface do Nextcloud apresentou dois trechos sugeridos para adicionar em `my.cnf`, sob a seção `[mysqld]`:
+A página Administração → Visão geral classificou os dois itens como **Dica**, sem marcá-los como falhas:
 
-```ini
-slow_query_log = ON
-long_query_time = 2
-```
+| Verificação | Valor observado | Sugestão exibida |
+|---|---:|---|
+| `slow_query_log` | `0` (desativado) | `slow_query_log = ON` |
+| `long_query_time` | 10 segundos | `long_query_time = 2` (ou menos) |
 
-São recomendações da interface para habilitar o log de consultas lentas e definir o limite indicado; não são evidência de que os parâmetros já estejam ativos. A interface informa que a aplicação exige reiniciar o banco. Nenhuma alteração ou reinicialização foi feita. Antes de considerar a recomendação, confirmar a configuração atualmente carregada e o arquivo de origem; avaliar localização, permissões e rotação do log. Manter isso separado da falha do `innodb_log_file_size` (96 MiB em execução; 256 MiB aparece pendente de reinicialização).
+Os trechos mostrados para adicionar em `my.cnf`, seção `[mysqld]`, são recomendações para registrar consultas lentas e reduzir o limite de registro. Não são evidência de que esses valores estejam definidos nos arquivos de configuração. Nenhuma alteração ou reinicialização foi feita. Esses itens são sugestões de diagnóstico/desempenho e não corrigem a falha separada de `innodb_log_file_size` (96 MiB em execução; 256 MiB aparece pendente de reinicialização). Caso sejam avaliados depois, confirmar a origem dos parâmetros e planejar retenção/permissões do log.
