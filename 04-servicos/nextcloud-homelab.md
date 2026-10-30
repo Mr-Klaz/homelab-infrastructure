@@ -1,8 +1,8 @@
 # Nextcloud pessoal no homelab
 
-**Estado documental:** proposta para revisão; baseada nas notas locais e capturas registradas em 26/10/2026.  
+**Estado documental:** atualizado até 30/10/2026.  
 **Escopo:** fotografia histórica, não verificação do servidor atual.  
-**Execução:** nenhuma mudança foi feita no host, VM ou LXC durante esta documentação.
+**Atualização:** ações de Tailscale e Nextcloud foram executadas pelo responsável com aprovação. Nenhuma porta foi aberta no roteador; esta atualização não altera o homelab.
 
 ## Princípio de uso e acesso
 
@@ -17,25 +17,35 @@ O Homelab é um servidor pessoal, para uso exclusivo do responsável. O Nextclou
 | Host | Proxmox VE 9.2.2 em Debian 13, conforme baseline existente; 8 GB físicos e um disco WD Purple de 2 TB |
 | VM Linux Mint | Existe e está desligada, conforme contexto do responsável; finalidade e recursos da VM não registrados nas evidências disponíveis |
 | Serviço | Nextcloud Hub 26 Summer, versão 35.0.2 na captura de 26/10/2026 |
-| Contêiner | LXC 110; recursos, sistema operacional e modo privilegiado não registrados |
-| Acesso | Instância observada em endereço privado da LAN; endereço omitido nesta proposta para o repositório público |
+| Contêiner | LXC 110 `nextcloud`, Debian 13.7, não privilegiado, 2 vCPUs, 2 GiB RAM, 512 MiB swap; inicialização automática desativada |
+| Acesso | HTTP na LAN e Tailscale privado configurado no host e no LXC; endereços e identificadores omitidos por privacidade |
 | Banco | MariaDB/tuning mencionados como tópico a documentar; versão, valores e validações não disponíveis nas evidências acessíveis |
 | Tarefas em segundo plano | Configuração Cron não confirmada nas capturas/notas acessíveis |
-| Backup | Destino independente e restauração não documentados; o host tem somente um disco físico |
+| Backup | Sem destino independente nem restauração testada; host com um único disco físico. Os originais de Destian Wars permanecem no PC pessoal |
 
 ## Host Proxmox, VM e armazenamento
 
-O baseline do repositório registra Proxmox VE 9.2.2, Debian GNU/Linux 13, Intel Xeon E5-2650 v4 (12 núcleos/24 threads), 8 GB de RAM e um único disco WD Purple de 2 TB. O storage `local` e o `local-lvm` ficam no mesmo disco físico, portanto snapshots ou cópias no próprio host não protegem contra falha desse disco.
+O baseline registra Proxmox VE 9.2.2 em Debian 13, 8 GB de RAM e um único disco físico WD Purple de 2 TB. Os storages `local` e `local-lvm`, assim como os volumes das VMs e containers, residem nesse disco; cópias no mesmo disco não protegem contra falha física.
 
-A VM Linux Mint já existe e permanece desligada. Não há informação suficiente para afirmar seu ID, vCPU, RAM, tamanho de disco, endereço, finalidade ou se contém dados a preservar. Confirmar esses dados antes de iniciar, alterar ou reaproveitar a VM.
+A VM 100 Linux Mint está desligada; o inventário compartilhado registrou 4 GiB de RAM e disco de boot de 32 GiB.
 
-O LXC 110 hospeda o Nextcloud. O storage Proxmox contém volumes de contêiner, mas as evidências não associam um volume específico ao LXC 110. Permanecem não documentados: storage e volume raiz do container, mounts adicionais, caminho `datadirectory`, localização do banco/configuração, capacidade livre e política de expansão.
+O LXC 110 `nextcloud` usa Debian 13.7, é não privilegiado e tem 2 vCPUs, 2 GiB de RAM e 512 MiB de swap. A configuração observada mantém inicialização automática desativada.
+
+A raiz do LXC é um volume de 16 GiB em `local-lvm`. Um volume adicional de 300 GB nominais está montado em `/mnt/nextcloud-data`; o sistema de arquivos ext4 apresentou 295 GB, com cerca de 280 GB livres em 29/10/2026. O `datadirectory` informado pelo Nextcloud é `/mnt/nextcloud-data/data`. Ambos os volumes ficam no disco físico único do host: o volume de dados é dedicado, mas não constitui backup independente.
+
+A interface do LXC recebe endereço por DHCP. Endereços privados e MACs foram omitidos.
 
 ## Rede e exposição
 
-A captura de 26/10/2026 mostra acesso pela LAN, via HTTP. O endereço foi deliberadamente omitido por esta proposta, pois o repositório é público. O endereço permanente, máscara, gateway, DHCP/reserva, firewall, DNS e eventuais regras de encaminhamento não foram verificados.
+O acesso LAN ao Nextcloud foi observado por HTTP. O endereço LAN do LXC é dinâmico por DHCP; não foi criada reserva no roteador. O responsável não conseguiu autenticar na interface administrativa do roteador, e nenhuma configuração foi alterada.
 
-As evidências disponíveis não demonstram publicação externa, proxy reverso, domínio público ou TLS configurado. A interface indicava HTTP inseguro e ausência do cabeçalho HSTS. HSTS só deve ser avaliado depois de HTTPS estar funcional para o nome de acesso correto. Não habilitar acesso remoto incidentalmente ao corrigir avisos.
+Tailscale 1.104.4 foi instalado no host Proxmox e no LXC 110; o Android entrou na mesma tailnet. O LXC é não privilegiado: foi necessário liberar `/dev/net/tun` por passthrough em Recursos do container e reiniciar o LXC. Depois do reinício, TUN foi confirmado disponível.
+
+O endereço Tailscale do LXC foi acrescentado como segunda entrada em `trusted_domains`, preservando a entrada LAN. Com Wi‑Fi doméstico ligado, o ping entre LXC e Android funcionou, e a URL Tailscale do Nextcloud exibiu a tela de login no navegador do celular. Isso valida o caminho privado via Wi‑Fi, não o acesso externo por dados móveis.
+
+Com apenas dados móveis, o Android exibiu aviso de relay indisponível, os pings expiraram e as páginas Tailscale não carregaram. O responsável identificou que o pacote de dados estava esgotado e pausou os testes. A causa móvel permanece sem diagnóstico; não concluir que a operadora bloqueia a Tailscale.
+
+O host Proxmox também permanece conectado à tailnet; não foi testado se sua interface de administração está acessível por esse caminho. Nenhum port forwarding, Funnel ou rota da rede doméstica foi configurado durante estas etapas.
 
 ## Nextcloud, PHP e Apache
 
@@ -59,11 +69,9 @@ A captura da administração indicava uma verificação do banco falhando, sem o
 
 ## Cron e janela de manutenção
 
-O valor `maintenance_window_start = 3` foi observado após uma alteração. Isso configura a janela de manutenção, mas não prova que o modo de tarefas de fundo esteja definido como Cron.
+O valor `maintenance_window_start = 3` foi observado após uma alteração. Isso define a janela de manutenção diária.
 
-Não há evidência acessível da tela de tarefas em modo Cron, da entrada do agendador dentro do LXC 110, da frequência ou de uma execução recente de `cron.php`. O serviço `cron` ativo no host Proxmox não comprova que o agendamento do Nextcloud esteja presente no container.
-
-Na próxima revisão documental, registrar o modo mostrado pelo Nextcloud, agendamento dentro do container (sem dados sensíveis), usuário de execução, frequência, horário/fuso e evidência de execução bem-sucedida. Fazer isso como coleta de estado, sem editar o sistema.
+Na coleta de 27/10, o modo de tarefas em segundo plano foi confirmado como `cron`, e `/etc/cron.d/nextcloud` agenda `cron.php` a cada cinco minutos como `www-data`. Ainda falta validar pela visão geral ou por registros do Nextcloud que as execuções recentes estão ocorrendo sem erro.
 
 ## Validações registradas
 
@@ -85,29 +93,21 @@ Esses itens são observações históricas e precisam ser rechecados antes de pr
 
 ## Riscos registrados
 
-1. **Falha do único disco:** host, volumes de VM/container e storage `local` compartilham o mesmo disco físico; não há backup independente documentado.
-2. **Recuperação incerta:** não foram identificados um conjunto consistente de backup de banco + arquivos + configuração e um teste de restauração.
-3. **Tráfego HTTP:** a captura indicava HTTP sem TLS, mesmo sendo acesso LAN.
-4. **Integridade/saúde do banco:** uma verificação falhava e o detalhe não foi capturado.
-5. **Tarefas assíncronas:** modo Cron e execução dentro do LXC não comprovados.
-6. **Recursos limitados:** host com 8 GB de RAM; limites e consumo do LXC não documentados. `memory_limit=512M` é limite PHP, não memória total do container.
-7. **DNS:** o baseline anterior registrou falha de resolução no host; causa e estado atual seguem desconhecidos.
-8. **VM desligada sem inventário:** não iniciar ou reutilizar a VM Linux Mint antes de confirmar discos e dados que devem ser preservados.
+1. **Falha do único disco:** host, VM, LXC e dados compartilham um único disco físico. Os originais de Destian Wars permanecem no PC, mas não há backup independente do servidor nem teste de restauração documentado.
+2. **Tráfego HTTP:** a interface LAN e a URL Tailscale foram observadas via HTTP; o acesso privado Tailscale funcionou no Wi‑Fi, mas HTTPS da aplicação ainda precisa ser avaliado.
+3. **Saúde do banco e logs:** o painel mostrou falha em verificação de banco e erros de log; o diagnóstico atual não foi feito.
+4. **Tarefas de fundo:** Cron está configurado, mas uma execução recente bem-sucedida ainda não foi confirmada.
+5. **Acesso privado ao host:** o Proxmox está conectado à tailnet; não foi verificado se a interface administrativa é alcançável por outros dispositivos dessa rede.
+6. **Acesso móvel externo:** os testes por dados móveis foram pausados quando se identificou pacote de dados esgotado; não há conclusão sobre a causa.
+7. **DNS do host:** o baseline de 14/10 registrou falha de resolução; estado atual desconhecido.
 
-## Próximas etapas documentais
+## Próximas etapas — estado em 30/10/2026
 
-Ordem proposta, respeitando a preferência de uma etapa por vez e documentação antes de mudanças:
-
-1. Confirmar inventário do LXC 110 e da VM Linux Mint, incluindo estados e recursos; não alterar serviços.
-2. Registrar mounts, storage, `datadirectory`, localização do banco e capacidade, sem copiar segredos.
-3. Obter evidência dos parâmetros MariaDB citados como tuning e da validação; se não houver registro, marcar como desconhecido em vez de reconstruir por suposição.
-4. Confirmar modo Cron e agendamento no container, frequência e execução recente; apenas observação.
-5. Revisar estado de backup independente e existência de restauração testada.
-6. Só após atualização documental e decisão do responsável, priorizar diagnóstico do banco/log e demais avisos, um item de cada vez.
-
-Nenhuma das etapas acima deve ser executada durante esta revisão. Nenhuma mudança foi feita no homelab.
-
-
+1. Quando houver dados móveis, retomar a validação do Tailscale no Android e o acesso remoto ao Nextcloud. O app Nextcloud do Android ainda não foi validado usando o endereço Tailscale; manter a conta LAN até o acesso remoto funcionar.
+2. Revisar se o Tailscale no host Proxmox deve permanecer conectado; se não for necessário, desconectá-lo para deixar somente o LXC Nextcloud na tailnet.
+3. Planejar backup consistente de arquivos, banco e configuração. Até adquirir outro disco, manter os originais de Destian Wars no PC; cópias no disco do homelab não protegem contra falha física.
+4. Confirmar uma execução recente bem-sucedida do Cron.
+5. Revalidar avisos de banco, logs e HTTPS antes de qualquer reparo, migração ou tuning.
 
 ## Inventário confirmado do host e do LXC — 27/10/2026
 
@@ -227,3 +227,24 @@ Os trechos mostrados para adicionar em `my.cnf`, seção `[mysqld]`, são recome
 ### Consulta dos arquivos MariaDB — 28/10/2026
 
 Uma busca somente de leitura em `/etc/mysql` e `/etc/my.cnf` por atribuições explícitas a `innodb_log_file_size`, `slow_query_log` e `long_query_time` não retornou linhas. Isso indica que esses parâmetros não aparecem explicitamente nesses caminhos consultados; não exclui outras fontes de configuração fora deles. Os valores em execução previamente observados continuam sendo a referência para o estado ativo. Nenhuma edição ou reinicialização foi feita.
+
+## Atualização consolidada — 29–30/10/2026
+
+Esta seção registra fatos confirmados após as coletas históricas acima e prevalece sobre lacunas anteriores quando houver conflito.
+
+### Arquivos Destian Wars
+
+O responsável confirmou que os itens iniciais do Nextcloud eram arquivos de demonstração. Depois, conectou o cliente de desktop no PC e criou sincronização clássica da pasta local Destian Wars para uma nova pasta remota `/Destian Wars`, sem arquivos virtuais. O cliente exibiu estado sem erro e a interface web passou a mostrar as pastas e imagens. A conta mostrava cerca de 168,7 MB usados; o número inclui outros arquivos de demonstração e não representa apenas Destian Wars. Os originais permanecem no PC.
+
+O app Nextcloud no Android também foi conectado, e o responsável abriu Destian Wars pelo Wi‑Fi doméstico. Isso valida acesso local, não constitui backup independente: os dados do servidor continuam no único disco físico do homelab.
+
+### Tailscale e acesso privado
+
+- Tailscale 1.104.4 foi instalado no host Proxmox e no LXC 110. O Android entrou na mesma tailnet.
+- Para o LXC não privilegiado, `/dev/net/tun` foi liberado por passthrough nos Recursos do container. O LXC foi reiniciado e a presença de TUN foi confirmada dentro dele.
+- O endereço Tailscale do LXC foi adicionado como segunda entrada em `trusted_domains`, preservando o endereço LAN. Endereços Tailscale e LAN foram omitidos.
+- Com Wi‑Fi doméstico ligado, o ping entre LXC e Android funcionou e a URL Tailscale do Nextcloud exibiu a tela de login no navegador do celular.
+- O teste com apenas dados móveis falhou: o app mostrou aviso de relay indisponível, o ping expirou e as páginas Tailscale não carregaram. O responsável identificou depois que o pacote de dados estava esgotado e pausou os testes. A causa móvel permanece sem diagnóstico; não concluir que a operadora bloqueia a Tailscale.
+- O host Proxmox permanece conectado à tailnet. O acesso à interface de administração do Proxmox por esse caminho não foi testado; avaliar se é necessário manter o host conectado.
+
+Não foram abertas portas no roteador, configurado port forwarding, anunciadas rotas da LAN ou habilitado Tailscale Funnel durante estas etapas. Nenhuma configuração do roteador foi alterada.
